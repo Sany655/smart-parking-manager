@@ -1,15 +1,14 @@
 # parking-manager
-parking manager project is assigned by Advance Database Management System course
-
+Smart Parking Management App using flutter, node.js and mysql
 
 # installation process
+## backend
+1. [setup node.js](https://nodejs.org/en/download) in your local device
+2. in the backend folder run "npm install"
+3. setup mysql/xampp and import smart_parking_db.sql from the backend folder to the http://localhost/phpmyadmin
+4. npm start
+
 ## frontend
-1. install/setup flutter in your local device
+1. [setup flutter](https://docs.flutter.dev/get-started) in your local device
 2. in the frontend directory "flutter pub get"
 3. flutter run (select one of the devices)
-
-## backend
-1. setup node.js in your local device
-2. in the backend folder run "npm install"
-3. copy .env.example .env
-4. npm start
