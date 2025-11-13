@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parking_manager/screens/home/view_slots_screen.dart';
 // Note: You would use a package like 'qr_flutter' for a real QR code.
 // For now, we'll use an icon as a placeholder.
 
@@ -87,39 +88,41 @@ class ConfirmationReceiptScreen extends StatelessWidget {
             const SizedBox(height: 30),
 
             // 3. QR Code (Placeholder)
-            Center(
-              child: Column(
-                children: [
-                  const Text(
-                    'Scan this QR code at the entry gate:',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    width: 150,
-                    height: 150,
-                    color: Colors.grey.shade200,
-                    child: const Icon(
-                      Icons.qr_code_2,
-                      size: 100,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    bookingId,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 40),
+            // Center(
+            //   child: Column(
+            //     children: [
+            //       const Text(
+            //         'Scan this QR code at the entry gate:',
+            //         style: TextStyle(fontSize: 16),
+            //       ),
+            //       const SizedBox(height: 10),
+            //       Container(
+            //         width: 150,
+            //         height: 150,
+            //         color: Colors.grey.shade200,
+            //         child: const Icon(
+            //           Icons.qr_code_2,
+            //           size: 100,
+            //           color: Colors.black,
+            //         ),
+            //       ),
+            //       const SizedBox(height: 8),
+            //       Text(
+            //         bookingId,
+            //         style: const TextStyle(fontWeight: FontWeight.w600),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            // const SizedBox(height: 40),
 
             // 4. Action Button
             ElevatedButton(
               onPressed: () {
                 // Pop all routes until the home screen (ViewSlotsScreen or a dedicated dashboard)
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const ViewSlotsScreen()),
+                );
                 // Optionally navigate specifically to the Track Status screen if it's not the first route
               },
               style: ElevatedButton.styleFrom(
@@ -127,7 +130,7 @@ class ConfirmationReceiptScreen extends StatelessWidget {
                 minimumSize: const Size(double.infinity, 50),
               ),
               child: const Text(
-                'Go to Home/Dashboard',
+                'View Slots',
                 style: TextStyle(fontSize: 18, color: Colors.white),
               ),
             ),

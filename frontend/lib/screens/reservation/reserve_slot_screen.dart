@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../../model/parking_slot.dart';
 // Assume ParkingSlot model is accessible
 // import '../home/view_slots_screen.dart'; // or wherever it is defined
 import '../payment/payment_screen.dart'; // Import the next screen
+import 'package:http/http.dart' as http;
+import '../../services/session_service.dart';
 
 class ReserveSlotScreen extends StatefulWidget {
   final ParkingSlot selectedSlot;
@@ -115,26 +119,58 @@ class _ReserveSlotScreenState extends State<ReserveSlotScreen> {
       _isLoading = true;
     });
 
-    // **TODO: API Call: POST /api/reservation/prepare**
-    // Payload should include: slotId, startTime, endTime, calculatedFee
-    await Future.delayed(Duration(seconds: 2)); // Simulate API delay
+    try {
+      // Get user_id from saved session
+      final userId = await SessionService.getUserId();
+      if (userId == null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('User not logged in. Please login again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      final hours = _calculateDurationInHours();
+      final amount = _calculateTotalFee(hours);
+
+      if (!mounted) return;
+
+      // Navigate to PaymentScreen with reservation details
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => PaymentScreen(
+            reservationDetails: {
+              'userId': userId,
+              'slotId': int.parse(widget.selectedSlot.id),
+              'slotName': widget.selectedSlot.name,
+              'fee': amount,
+              'startTime': _startTime.toIso8601String(),
+              'endTime': _endTime.toIso8601String(),
+              'duration': hours,
+            },
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      print('Error: $e');
+    }
 
     setState(() {
       _isLoading = false;
     });
-
-    // On success: Navigate to PaymentScreen
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => PaymentScreen(
-          reservationDetails: {
-            'slotName': widget.selectedSlot.name,
-            'fee': _calculateTotalFee(_calculateDurationInHours()),
-            // Pass other necessary data for the payment API call
-          },
-        ),
-      ),
-    );
   }
 
   @override

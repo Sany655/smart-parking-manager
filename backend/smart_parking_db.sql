@@ -27,8 +27,8 @@ CREATE TABLE Reservations (
     reservation_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT,
     slot_id INT,
-    reservation_time DATETIME NOT NULL,
-    status ENUM('pending', 'confirmed', 'cancelled') DEFAULT 'pending',
+    start_time DATETIME,
+    end_time DATETIME,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (slot_id) REFERENCES Parking_Slots(slot_id) ON DELETE CASCADE
@@ -66,23 +66,9 @@ CREATE TABLE Feedback (
 
 -- Insert sample data for testing
 INSERT INTO Users (username, email, password, phone, vehicle_number) VALUES
-('john_doe', 'john@example.com', 'hashed_password_123', '1234567890', 'XYZ1234'),
-('jane_smith', 'jane@example.com', 'hashed_password_456', '0987654321', 'XYZ1234');
-
-INSERT INTO Parking_Slots (slot_number, is_available, location) VALUES
-('A1', TRUE, 'First Floor'),
-('A2', TRUE, 'First Floor'),
-('B1', FALSE, 'Second Floor');
-
-INSERT INTO Reservations (user_id, slot_id, reservation_time, status) VALUES
-(1, 1, '2025-09-26 10:00:00', 'confirmed'),
-(2, 2, '2025-09-26 12:00:00', 'pending');
-
-INSERT INTO Check_In_Out (reservation_id, check_in_time, check_out_time) VALUES
-(1, '2025-09-26 10:05:00', NULL);
-
-INSERT INTO Payments (reservation_id, amount, payment_status) VALUES
-(1, 15.00, 'completed');
+('asdf', 'asdf@gmail.com', 'asdfasdf', '1234567890', 'XYZ1234'),
+('attendant', 'attendant@gmail.com', 'asdfasdf', '1234567890', 'XYZ1234'),
+('admin', 'admin@gmail.com', 'asdfasdf', '0987654321', 'XYZ1234');
 
 INSERT INTO Feedback (user_id, rating, comments) VALUES
 (1, 4, 'Great parking system, but needs more slots.'),

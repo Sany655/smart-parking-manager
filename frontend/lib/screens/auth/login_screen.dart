@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import '../parking-attendant/attendant_dashboard_screen.dart';
 import '../home/view_slots_screen.dart'; // Import the next screen
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../auth/registration_screen.dart';
-import '../admin/slot_management_screen.dart';
+import '../admin/admin_dashboard_screen.dart';
+import '../../services/session_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,8 +16,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController(text: 'admin@gmail.com');
+  final TextEditingController _passwordController = TextEditingController(text: 'asdfasdf');
   bool _isLoading = false;
 
   void _login() async {
@@ -46,13 +48,14 @@ class _LoginScreenState extends State<LoginScreen> {
               final decoded = jsonDecode(httpResponse.body);
               print('Login Successful: $decoded');
               print(decoded['user']['email']);
+              
+              // Save user data to SharedPreferences
+              await SessionService.saveUserData(decoded['user']);
+              
               Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => decoded['user']['email'] == 'mazharulalam26@gmail.com' ? SlotManagementScreen() : ViewSlotsScreen()),
+                MaterialPageRoute(builder: (context) => decoded['user']['email'] == 'admin@gmail.com' ? AdminDashboardScreen() : decoded['user']['email'] == 'attendant@gmail.com' ? AttendantDashboardScreen() : ViewSlotsScreen()),
               );
             }
-            // Navigator.of(context).pushReplacement(
-            //   MaterialPageRoute(builder: (context) => ViewSlotsScreen()),
-            // );
           } else {
             if (!mounted) return;
             String errorMsg = 'Login Failed! Check credentials.';

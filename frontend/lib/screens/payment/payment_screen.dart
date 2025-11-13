@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../payment/confirmation_receipt_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 // NOTE: Placeholder for the next screen in the flow
 // class ConfirmationReceiptScreen extends StatelessWidget {
@@ -91,34 +93,74 @@ class _PaymentScreenState extends State<PaymentScreen> {
         _isLoading = true;
       });
 
-      // **TODO: API Call: POST /api/payment/process**
-      // In a real app, this integrates with a payment gateway (Stripe, PayPal, etc.)
-      // Payload would include: reservation ID, amount, payment token (from gateway)
-      await Future.delayed(
-        const Duration(seconds: 3),
-      ); // Simulate payment processing delay
+      try {
+        // Make reservation API call
+        final url = Uri.parse('http://localhost:3000/reservation/create');
+        final response = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'user_id': widget.reservationDetails['userId'],
+            'slot_id': widget.reservationDetails['slotId'],
+            'start_time': widget.reservationDetails['startTime'],
+            'end_time': widget.reservationDetails['endTime'],
+            'amount': widget.reservationDetails['fee'],
+          }),
+        );
+
+        if (!mounted) return;
+
+        if (response.statusCode == 200) {
+          final responseData = jsonDecode(response.body);
+          print('Reservation created: $responseData');
+
+          // Navigate to ConfirmationReceiptScreen
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => ConfirmationReceiptScreen(
+                reservationData: {
+                  ...widget.reservationDetails,
+                  'reservation_id': responseData['reservation_id'],
+                  'payment_id': responseData['payment_id'],
+                  'transactionId': 'TXN${responseData['payment_id']}',
+                  'timeProcessed': DateTime.now().toString(),
+                },
+              ),
+            ),
+          );
+        } else {
+          String errorMsg = 'Failed to create reservation';
+          try {
+            final decoded = jsonDecode(response.body);
+            if (decoded is Map && decoded.containsKey('error')) {
+              errorMsg = decoded['error'].toString();
+            }
+          } catch (_) {}
+          
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMsg),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        print('Error: $e');
+      }
 
       setState(() {
         _isLoading = false;
       });
-
-      // On success: Navigate to ConfirmationReceiptScreen
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => ConfirmationReceiptScreen(
-            reservationData: {
-              ...widget.reservationDetails,
-              'transactionId': 'TXN123456789',
-              'timeProcessed': DateTime.now().toString(),
-            },
-          ),
-        ),
-      );
     }
-  }
-
-  @override
+  }  @override
   Widget build(BuildContext context) {
     final fee = widget.reservationDetails['fee'] ?? 0.0;
 
