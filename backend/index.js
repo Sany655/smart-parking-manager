@@ -1,6 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const db = require('./db.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -8,23 +9,6 @@ const PORT = process.env.PORT || 3000;
 // Middleware to parse JSON
 app.use(express.json());
 app.use(cors());
-
-// Create MySQL connection
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'smart_parking_db'
-});
-
-// Connect to MySQL
-db.connect((err) => {
-    if (err) {
-        console.error('Error connecting to MySQL:', err);
-        process.exit(1);
-    }
-    console.log('Connected to MySQL database');
-});
 
 // Basic route
 app.get('/', (req, res) => {
