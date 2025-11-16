@@ -14,11 +14,14 @@ CREATE TABLE Users (
 );
 
 -- Create Parking_Slots table
+
 CREATE TABLE Parking_Slots (
     slot_id INT PRIMARY KEY AUTO_INCREMENT,
-    slot_number VARCHAR(10) NOT NULL UNIQUE,
+    slot_number VARCHAR(10) NOT NULL,
     is_available BOOLEAN DEFAULT TRUE,
     location VARCHAR(100),
+    vehicle_type ENUM('Bike', 'Car', 'MicroBus') NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
