@@ -44,16 +44,21 @@ class _LoginScreenState extends State<LoginScreen> {
           );
 
           if (httpResponse.statusCode == 200) {
-            if(httpResponse.body.isNotEmpty) {
+            if (httpResponse.body.isNotEmpty) {
               final decoded = jsonDecode(httpResponse.body);
-              print('Login Successful: $decoded');
-              print(decoded['user']['email']);
-              
+
               // Save user data to SharedPreferences
               await SessionService.saveUserData(decoded['user']);
-              
+
+              if (!mounted) return;
               Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => decoded['user']['email'] == 'admin@gmail.com' ? AdminDashboardScreen() : decoded['user']['email'] == 'attendant@gmail.com' ? AttendantDashboardScreen() : ViewSlotsScreen()),
+                MaterialPageRoute(
+                  builder: (context) => decoded['user']['email'] == 'admin@gmail.com'
+                      ? AdminDashboardScreen()
+                      : decoded['user']['email'] == 'attendant@gmail.com'
+                          ? AttendantDashboardScreen()
+                          : const ViewSlotsScreen(),
+                ),
               );
             }
           } else {
@@ -87,72 +92,166 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Parking App Login')),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32.0),
-          child: Form(
-            key: _formKey,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                // 1. Email Input
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email (e.g., test@app.com)',
-                    border: OutlineInputBorder(),
+              children: [
+                // App Logo/Header
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 3),
                   ),
-                  validator: (value) {
-                    if (value == null || !value.contains('@')) {
-                      return 'Enter a valid email address.';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // 2. Password Input
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Password (min 6 chars)',
-                    border: OutlineInputBorder(),
+                  child: const Icon(
+                    Icons.local_parking,
+                    color: Colors.white,
+                    size: 48,
                   ),
-                  validator: (value) {
-                    if (value == null || value.length < 6) {
-                      return 'Password must be at least 6 characters.';
-                    }
-                    return null;
-                  },
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
+                const Text(
+                  'Smart Parking',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Manager',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                // Login Card
+                Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  elevation: 12,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          Text(
+                            'Welcome Back',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              color: const Color(0xFF1E88E5),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Sign in to your account',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: 24),
 
-                // 3. Login Button
-                _isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: _login,
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 50),
-                        ),
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(fontSize: 18),
-                        ),
+                          // Email
+                          TextFormField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              labelText: 'Email Address',
+                              prefixIcon: const Icon(Icons.email_outlined),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                              filled: true,
+                              fillColor: const Color(0xFFF5F5F5),
+                            ),
+                            validator: (value) {
+                              if (value == null || !value.contains('@')) {
+                                return 'Enter a valid email address.';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Password
+                          TextFormField(
+                            controller: _passwordController,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              labelText: 'Password',
+                              prefixIcon: const Icon(Icons.lock_outline),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                              filled: true,
+                              fillColor: const Color(0xFFF5F5F5),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.length < 6) {
+                                return 'Password must be at least 6 characters.';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Login Button
+                          _isLoading
+                              ? const Center(child: CircularProgressIndicator(color: Color(0xFF1E88E5)))
+                              : SizedBox(
+                                  height: 54,
+                                  child: ElevatedButton(
+                                    onPressed: _login,
+                                    style: ElevatedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                      backgroundColor: const Color(0xFF1E88E5),
+                                      elevation: 4,
+                                    ),
+                                    child: const Text(
+                                      'Login',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                          const SizedBox(height: 16),
+
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => const RegistrationScreen()),
+                              );
+                            },
+                            child: const Text(
+                              'Don\'t have an account? Sign Up',
+                              style: TextStyle(
+                                color: Color(0xFF1E88E5),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                const SizedBox(height: 16),
-
-                // 4. Registration Link (Dummy)
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => RegistrationScreen()),
-                    );
-                  },
-                  child: const Text('Don\'t have an account? Sign Up'),
+                    ),
+                  ),
                 ),
               ],
             ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import '../reservation/reserve_slot_screen.dart';
 import '../../model/parking_slot.dart';
 import 'dart:convert';
 import '../auth/login_screen.dart'; // Import the previous screen
@@ -122,8 +121,7 @@ class _SlotManagementScreenState extends State<SlotManagementScreen> {
                 id: slot['slot_id'].toString(),
                 name: slot['location'],
                 is_available: slot['is_available'] as int,
-                //   ratePerHour: (slot['ratePerHour'] as num).toDouble(),
-                ratePerHour: 12.0, // Placeholder rate
+                ratePerHour: (slot['price'] as num?)?.toDouble() ?? 12.0,
               ),
             )
             .toList();

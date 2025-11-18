@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -289,10 +288,11 @@ class _UndevelopedFeedbackScreenState extends State<UndevelopedFeedbackScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Share Feedback'),
+          centerTitle: true,
           flexibleSpace: Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
+                colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -300,9 +300,10 @@ class _UndevelopedFeedbackScreenState extends State<UndevelopedFeedbackScreen> {
           ),
           bottom: const TabBar(
             indicatorColor: Colors.white,
+            indicatorWeight: 3,
             tabs: [
-              Tab(text: 'Submit Feedback'),
-              Tab(text: 'Your Feedback'),
+              Tab(text: 'Submit Feedback', height: 50),
+              Tab(text: 'Your Feedback', height: 50),
             ],
           ),
         ),
@@ -316,70 +317,99 @@ class _UndevelopedFeedbackScreenState extends State<UndevelopedFeedbackScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Text(
-                      'Rate your experience:',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Rating Widget
-                    Center(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: List.generate(5, (index) {
-                          return IconButton(
-                            icon: Icon(
-                              index < _rating ? Icons.star : Icons.star_border,
-                              color: Colors.amber,
-                              size: 40,
+                    Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              'Rate your experience:',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF1565C0),
+                              ),
                             ),
-                            onPressed: () {
-                              setState(() {
-                                _rating = (index + 1).toDouble();
-                              });
-                            },
-                          );
-                        }),
-                      ),
-                    ),
-                    const SizedBox(height: 32),
+                            const SizedBox(height: 20),
 
-                    // Comments Input
-                    const Text(
-                      'Your Comments:',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                            // Rating Widget
+                            Center(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: List.generate(5, (index) {
+                                  return IconButton(
+                                    icon: Icon(
+                                      index < _rating ? Icons.star : Icons.star_border,
+                                      color: const Color(0xFFFFC107),
+                                      size: 44,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _rating = (index + 1).toDouble();
+                                      });
+                                    },
+                                  );
+                                }),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _commentsController,
-                      maxLines: 6,
-                      decoration: const InputDecoration(
-                        hintText: 'Share your feedback, suggestions, or concerns...',
-                        border: OutlineInputBorder(),
-                        alignLabelWithHint: true,
+                    const SizedBox(height: 24),
+
+                    Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              'Your Comments:',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF1565C0),
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            TextFormField(
+                              controller: _commentsController,
+                              maxLines: 6,
+                              decoration: InputDecoration(
+                                hintText: 'Share your feedback, suggestions, or concerns...',
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                filled: true,
+                                fillColor: const Color(0xFFF5F5F5),
+                                alignLabelWithHint: true,
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your feedback';
+                                }
+                                if (value.length < 5) {
+                                  return 'Feedback must be at least 5 characters';
+                                }
+                                return null;
+                              },
+                              maxLength: 500,
+                            ),
+                          ],
+                        ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your feedback';
-                        }
-                        if (value.length < 5) {
-                          return 'Feedback must be at least 5 characters';
-                        }
-                        return null;
-                      },
-                      maxLength: 500,
                     ),
                     const SizedBox(height: 32),
 
                     // Submit Button
                     _isLoading
-                        ? const Center(child: CircularProgressIndicator())
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1E88E5)),
+                            ),
+                          )
                         : GestureDetector(
                             onTapDown: (_) {
                               setState(() => _submitButtonScale = 0.98);
@@ -394,20 +424,22 @@ class _UndevelopedFeedbackScreenState extends State<UndevelopedFeedbackScreen> {
                             child: AnimatedScale(
                               scale: _submitButtonScale,
                               duration: const Duration(milliseconds: 120),
-                              child: ElevatedButton(
+                              child: ElevatedButton.icon(
                                 onPressed: null,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF2575FC),
-                                  minimumSize: const Size(double.infinity, 50),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                child: const Text(
+                                icon: const Icon(Icons.send),
+                                label: const Text(
                                   'Submit Feedback',
                                   style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF1E88E5),
+                                  minimumSize: const Size(double.infinity, 54),
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
                               ),
@@ -420,11 +452,18 @@ class _UndevelopedFeedbackScreenState extends State<UndevelopedFeedbackScreen> {
 
             // Tab 2: Your Feedback
             _userFeedbacks.isEmpty
-                ? const Center(
-                    child: Text('No feedback submitted yet.'),
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.feedback_outlined, size: 64, color: Colors.grey.shade400),
+                        const SizedBox(height: 16),
+                        const Text('No feedback submitted yet.', style: TextStyle(fontSize: 16)),
+                      ],
+                    ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(12.0),
                     itemCount: _userFeedbacks.length,
                     itemBuilder: (context, index) {
                       final feedback = _userFeedbacks[index];
@@ -443,7 +482,10 @@ class _UndevelopedFeedbackScreenState extends State<UndevelopedFeedbackScreen> {
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 400),
                           transform: Matrix4.translationValues(0, visible ? 0 : 16, 0),
-                          child: VxBox(
+                          child: Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            margin: const EdgeInsets.symmetric(vertical: 10),
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: isEditing
@@ -453,17 +495,14 @@ class _UndevelopedFeedbackScreenState extends State<UndevelopedFeedbackScreen> {
                                       children: [
                                         // Header with rating and action buttons
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: List.generate(5, (i) {
                                                 return Icon(
-                                                  i < rating
-                                                      ? Icons.star
-                                                      : Icons.star_border,
-                                                  color: Colors.amber,
+                                                  i < rating ? Icons.star : Icons.star_border,
+                                                  color: const Color(0xFFFFC107),
                                                   size: 20,
                                                 );
                                               }),
@@ -471,20 +510,18 @@ class _UndevelopedFeedbackScreenState extends State<UndevelopedFeedbackScreen> {
                                             Row(
                                               children: [
                                                 IconButton(
-                                                  icon: const Icon(Icons.edit,
-                                                      color: Colors.indigo),
+                                                  icon: const Icon(Icons.edit_outlined,
+                                                      color: Color(0xFF1E88E5), size: 20),
                                                   onPressed: () {
                                                     setState(() {
-                                                      _editingFeedbackId =
-                                                          feedbackId;
-                                                      _editingRating =
-                                                          rating.toDouble();
+                                                      _editingFeedbackId = feedbackId;
+                                                      _editingRating = rating.toDouble();
                                                     });
                                                   },
                                                 ),
                                                 IconButton(
-                                                  icon: const Icon(Icons.delete,
-                                                      color: Colors.redAccent),
+                                                  icon: const Icon(Icons.delete_outline,
+                                                      color: Color(0xFFE74C3C), size: 20),
                                                   onPressed: () {
                                                     _deleteFeedback(feedbackId);
                                                   },
@@ -496,19 +533,23 @@ class _UndevelopedFeedbackScreenState extends State<UndevelopedFeedbackScreen> {
                                         const Divider(),
 
                                         // Comments
-                                        comments.text.size(14).make(),
+                                        Text(
+                                          comments,
+                                          style: Theme.of(context).textTheme.bodyMedium,
+                                        ),
                                         const SizedBox(height: 12),
 
                                         // Submitted date
-                                        'Submitted: $createdAt'
-                                            .text
-                                            .sm
-                                            .gray600
-                                            .make(),
+                                        Text(
+                                          'Submitted: $createdAt',
+                                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
                                       ],
                                     ),
                             ),
-                          ).white.roundedLg.shadowLg.make(),
+                          ),
                         ),
                       );
                     },

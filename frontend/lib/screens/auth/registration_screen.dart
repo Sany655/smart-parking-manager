@@ -52,6 +52,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         }),
       );
 
+
       setState(() {
         _isLoading = false;
       });
@@ -74,7 +75,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
       // Navigate to the main app shell
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => ViewSlotsScreen()),
+        MaterialPageRoute(builder: (context) => const ViewSlotsScreen()),
       );
     }
   }
@@ -92,117 +93,163 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('New Account Registration')),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                // 1. Full Name
-                TextFormField(
-                  controller: _nameController,
-                  keyboardType: TextInputType.name,
-                  decoration: const InputDecoration(
-                    labelText: 'Full Name',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
-                  ),
-                  validator: (value) => (value?.isEmpty ?? true)
-                      ? 'Please enter your name.'
-                      : null,
-                ),
-                const SizedBox(height: 16),
-
-                // 2. Email Input
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email Address',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
-                  ),
-                  validator: (value) {
-                    if (value == null || !value.contains('@')) {
-                      return 'Enter a valid email address.';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // 3. Password Input
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Password (min 8 chars)',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock),
-                  ),
-                  validator: (value) => (value == null || value.length < 8)
-                      ? 'Password must be at least 8 characters.'
-                      : null,
-                ),
-                const SizedBox(height: 16),
-
-                // 4. Confirm Password Input
-                TextFormField(
-                  controller: _confirmPasswordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Confirm Password',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock),
-                  ),
-                  validator: (value) => (value != _passwordController.text)
-                      ? 'Passwords do not match.'
-                      : null,
-                ),
-                const SizedBox(height: 16),
-
-                // 5. License Plate
-                TextFormField(
-                  controller: _plateController,
-                  textCapitalization: TextCapitalization.characters,
-                  decoration: const InputDecoration(
-                    labelText: 'Vehicle License Plate',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.directions_car),
-                  ),
-                  validator: (value) => (value?.isEmpty ?? true)
-                      ? 'Required for parking registration.'
-                      : null,
-                ),
-                const SizedBox(height: 32),
-
-                // 6. Register Button
-                _isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: _register,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.indigo,
-                          minimumSize: const Size(double.infinity, 50),
-                        ),
-                        child: const Text(
-                          'Create Account',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
+      appBar: AppBar(
+        title: const Text('Create Account'),
+        backgroundColor: const Color(0xFF1E88E5),
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFF0F7FF), Color(0xFFE3F2FD)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+            child: Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              elevation: 8,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        'Join Us',
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: const Color(0xFF1E88E5),
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                const SizedBox(height: 16),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Create your account to get started',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 24),
 
-                // 7. Login Link
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Go back to LoginScreen
-                  },
-                  child: const Text('Already have an account? Login'),
+                      TextFormField(
+                        controller: _nameController,
+                        keyboardType: TextInputType.name,
+                        decoration: InputDecoration(
+                          labelText: 'Full Name',
+                          prefixIcon: const Icon(Icons.person_outline),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          filled: true,
+                          fillColor: const Color(0xFFF5F5F5),
+                        ),
+                        validator: (value) => (value?.isEmpty ?? true) ? 'Please enter your name.' : null,
+                      ),
+                      const SizedBox(height: 14),
+
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Email Address',
+                          prefixIcon: const Icon(Icons.email_outlined),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          filled: true,
+                          fillColor: const Color(0xFFF5F5F5),
+                        ),
+                        validator: (value) {
+                          if (value == null || !value.contains('@')) {
+                            return 'Enter a valid email address.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 14),
+
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: 'Password (min 8 chars)',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          filled: true,
+                          fillColor: const Color(0xFFF5F5F5),
+                        ),
+                        validator: (value) => (value == null || value.length < 8) ? 'Password must be at least 8 characters.' : null,
+                      ),
+                      const SizedBox(height: 14),
+
+                      TextFormField(
+                        controller: _confirmPasswordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: 'Confirm Password',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          filled: true,
+                          fillColor: const Color(0xFFF5F5F5),
+                        ),
+                        validator: (value) => (value != _passwordController.text) ? 'Passwords do not match.' : null,
+                      ),
+                      const SizedBox(height: 14),
+
+                      TextFormField(
+                        controller: _plateController,
+                        textCapitalization: TextCapitalization.characters,
+                        decoration: InputDecoration(
+                          labelText: 'Vehicle License Plate',
+                          prefixIcon: const Icon(Icons.directions_car_outlined),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          filled: true,
+                          fillColor: const Color(0xFFF5F5F5),
+                        ),
+                        validator: (value) => (value?.isEmpty ?? true) ? 'Required for parking registration.' : null,
+                      ),
+                      const SizedBox(height: 24),
+
+                      _isLoading
+                          ? const CircularProgressIndicator(color: Color(0xFF1E88E5))
+                          : SizedBox(
+                              width: double.infinity,
+                              height: 52,
+                              child: ElevatedButton(
+                                onPressed: _register,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF1E88E5),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  elevation: 4,
+                                ),
+                                child: const Text(
+                                  'Create Account',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                      const SizedBox(height: 12),
+
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text(
+                          'Already have an account? Login',
+                          style: TextStyle(
+                            color: Color(0xFF1E88E5),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
           ),
         ),

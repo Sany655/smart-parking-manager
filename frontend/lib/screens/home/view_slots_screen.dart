@@ -37,8 +37,7 @@ class _ViewSlotsScreenState extends State<ViewSlotsScreen> {
                 id: slot['slot_id'].toString(),
                 name: slot['location'],
                 is_available: slot['is_available'] as int,
-                //   ratePerHour: (slot['ratePerHour'] as num).toDouble(),
-                ratePerHour: 12.0, // Placeholder rate
+                ratePerHour: (slot['price'] as num?)?.toDouble() ?? 12.0,
               ),
             )
             .toList();
@@ -55,26 +54,33 @@ class _ViewSlotsScreenState extends State<ViewSlotsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Available Parking Slots'),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              // Navigate back to LoginScreen
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.blue,
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            child: const Text('Logout'),
           ),
+        ),
+        actions: [
           IconButton(
+            tooltip: 'Refresh',
             icon: const Icon(Icons.refresh),
             onPressed: () {
               setState(() {
-                _slotsFuture = _fetchParkingSlots(); // Re-fetch data
+                _slotsFuture = _fetchParkingSlots();
               });
+            },
+          ),
+          IconButton(
+            tooltip: 'Logout',
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+              );
             },
           ),
         ],
@@ -83,62 +89,129 @@ class _ViewSlotsScreenState extends State<ViewSlotsScreen> {
         future: _slotsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1E88E5)),
+              ),
+            );
           } else if (snapshot.hasError) {
             return Center(
-              child: Text('Error loading slots: ${snapshot.error}'),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Color(0xFFE74C3C)),
+                  const SizedBox(height: 16),
+                  Text('Error loading slots: ${snapshot.error}'),
+                ],
+              ),
             );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No parking slots found.'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.local_parking_outlined, size: 64, color: Colors.grey.shade400),
+                  const SizedBox(height: 16),
+                  const Text('No parking slots found.', style: TextStyle(fontSize: 16)),
+                ],
+              ),
+            );
           } else {
-            // Data loaded successfully
             final slots = snapshot.data!;
             return ListView.builder(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               itemCount: slots.length,
               itemBuilder: (context, index) {
                 final slot = slots[index];
+                final available = slot.is_available == 1;
                 return Card(
-                  color: slot.is_available == 1
-                      ? Colors.green.shade50
-                      : Colors.red.shade50,
-                  margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListTile(
-                    leading: Icon(
-                      slot.is_available == 1
-                          ? Icons.local_parking
-                          : Icons.not_interested,
-                      color: slot.is_available == 1 ? Colors.green : Colors.red,
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  color: available ? Colors.white : const Color(0xFFF5F5F5),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: available ? const Color(0xFFE3F2FD) : const Color(0xFFEEEEEE),
+                        width: 2,
+                      ),
                     ),
-                    title: Text(
-                      slot.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text(
-                      'Rate: \$${slot.ratePerHour.toStringAsFixed(2)}/hr',
-                    ),
-                    trailing: slot.is_available == 1
-                        ? ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ReserveSlotScreen(selectedSlot: slot),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                            ),
-                            child: const Text(
-                              'Reserve',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          )
-                        : const Text(
-                            'Occupied',
-                            style: TextStyle(color: Colors.red),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      leading: Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: available ? const Color(0xFFE8F5E9) : const Color(0xFFFFEBEE),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          available ? Icons.local_parking : Icons.not_interested,
+                          color: available ? const Color(0xFF4CAF50) : const Color(0xFFE74C3C),
+                          size: 28,
+                        ),
+                      ),
+                      title: Text(
+                        slot.name,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF1565C0),
+                        ),
+                      ),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 6.0),
+                        child: Text(
+                          'Rate: \$${slot.ratePerHour.toStringAsFixed(2)}/hr',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w500,
                           ),
+                        ),
+                      ),
+                      trailing: available
+                          ? SizedBox(
+                              height: 40,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => ReserveSlotScreen(selectedSlot: slot),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF1E88E5),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  elevation: 2,
+                                ),
+                                child: const Text(
+                                  'Reserve',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE74C3C),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Text(
+                                'Occupied',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                    ),
                   ),
                 );
               },

@@ -14,124 +14,194 @@ class ConfirmationReceiptScreen extends StatelessWidget {
     final double fee = reservationData['fee'] ?? 0.0;
     final String bookingId = reservationData['transactionId'] ?? 'N/A';
 
-    // Convert time strings to readable format if they exist
-    // (Assuming you pass DateTime objects or clear format strings from previous screens)
     String formatTime(String? time) {
       if (time == null) return 'N/A';
       try {
         final dt = DateTime.parse(time);
         return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')} on ${dt.month}/${dt.day}';
       } catch (e) {
-        return time.substring(0, 16); // Fallback to partial string
+        return time.substring(0, 16);
       }
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Confirmation Receipt')),
+      appBar: AppBar(
+        title: const Text('Confirmation Receipt'),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // 1. Success Header
-            const Icon(
-              Icons.check_circle_outline,
-              color: Colors.green,
-              size: 80,
-            ),
-            const SizedBox(height: 10),
-            const Center(
-              child: Text(
-                'Reservation Confirmed!',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
-                ),
+            Container(
+              alignment: Alignment.center,
+              child: Column(
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5E9),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.check_circle,
+                      color: Color(0xFF4CAF50),
+                      size: 56,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Reservation Confirmed!',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF4CAF50),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Your parking is reserved',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 32),
 
             // 2. Booking Details Card
             Card(
-              elevation: 4,
+              elevation: 3,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildDetailRow('Booking ID:', bookingId),
-                    const Divider(),
+                    Text(
+                      'Booking Details',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1565C0),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDetailRow(
+                      'Booking ID:',
+                      bookingId,
+                      context,
+                    ),
+                    const Divider(height: 20),
                     _buildDetailRow(
                       'Parking Slot:',
                       reservationData['slotName'] ?? 'N/A',
+                      context,
                       isPrimary: true,
                     ),
+                    const SizedBox(height: 12),
                     _buildDetailRow(
                       'Total Fee Paid:',
                       '\$${fee.toStringAsFixed(2)}',
+                      context,
                       isPrimary: true,
                     ),
-                    const Divider(),
+                    const Divider(height: 20),
                     _buildDetailRow(
                       'Check-in Time:',
                       formatTime(reservationData['startTime']),
+                      context,
                     ),
+                    const SizedBox(height: 12),
                     _buildDetailRow(
                       'Check-out Time:',
                       formatTime(reservationData['endTime']),
+                      context,
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 32),
 
-            // 3. QR Code (Placeholder)
-            // Center(
-            //   child: Column(
-            //     children: [
-            //       const Text(
-            //         'Scan this QR code at the entry gate:',
-            //         style: TextStyle(fontSize: 16),
-            //       ),
-            //       const SizedBox(height: 10),
-            //       Container(
-            //         width: 150,
-            //         height: 150,
-            //         color: Colors.grey.shade200,
-            //         child: const Icon(
-            //           Icons.qr_code_2,
-            //           size: 100,
-            //           color: Colors.black,
-            //         ),
-            //       ),
-            //       const SizedBox(height: 8),
-            //       Text(
-            //         bookingId,
-            //         style: const TextStyle(fontWeight: FontWeight.w600),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-            // const SizedBox(height: 40),
+            // 3. QR Code Placeholder
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  children: [
+                    Text(
+                      'Scan at Entry Gate',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      width: 140,
+                      height: 140,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF0F7FF),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFFBBDEFB),
+                          width: 2,
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.qr_code_2,
+                        size: 100,
+                        color: Color(0xFF1E88E5),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SelectableText(
+                      bookingId,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: Color(0xFF1565C0),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
 
             // 4. Action Button
-            ElevatedButton(
+            ElevatedButton.icon(
               onPressed: () {
-                // Pop all routes until the home screen (ViewSlotsScreen or a dedicated dashboard)
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const ViewSlotsScreen()),
                 );
-                // Optionally navigate specifically to the Track Status screen if it's not the first route
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                minimumSize: const Size(double.infinity, 50),
+              icon: const Icon(Icons.home),
+              label: const Text(
+                'Back to Slots',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              child: const Text(
-                'View Slots',
-                style: TextStyle(fontSize: 18, color: Colors.white),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1E88E5),
+                minimumSize: const Size(double.infinity, 54),
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
           ],
@@ -140,26 +210,26 @@ class ConfirmationReceiptScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {bool isPrimary = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
+  Widget _buildDetailRow(String label, String value, BuildContext context, {bool isPrimary = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Colors.grey.shade700,
+            fontWeight: FontWeight.w500,
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: isPrimary ? FontWeight.bold : FontWeight.normal,
-              color: isPrimary ? Colors.black : Colors.black87,
-            ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: isPrimary ? FontWeight.bold : FontWeight.w600,
+            color: isPrimary ? const Color(0xFF1565C0) : const Color(0xFF0D47A1),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

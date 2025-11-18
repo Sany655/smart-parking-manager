@@ -59,9 +59,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Profile'),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         actions: [
           IconButton(
-            icon: Icon(_isEditing ? Icons.save : Icons.edit),
+            icon: Icon(_isEditing ? Icons.save : Icons.edit_outlined),
             onPressed: () {
               if (_isEditing) {
                 _saveProfile();
@@ -75,22 +85,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            // Profile Header
+            Center(
+              child: Column(
+                children: [
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE3F2FD),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFF1E88E5), width: 3),
+                    ),
+                    child: const Icon(
+                      Icons.account_circle,
+                      color: Color(0xFF1E88E5),
+                      size: 60,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    _userData['name']!,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF1565C0),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _userData['email']!,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+
             // User Information Card
             Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Personal Information',
-                      style: Theme.of(context).textTheme.titleLarge,
+                    Row(
+                      children: [
+                        const Icon(Icons.person_outline, color: Color(0xFF1E88E5)),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Personal Information',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF1565C0),
+                          ),
+                        ),
+                      ],
                     ),
-                    const Divider(),
+                    const Divider(height: 20),
                     _buildEditableField(
                       'Name',
                       _nameController,
@@ -115,16 +174,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // Vehicle Information Card
             Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Vehicle Details',
-                      style: Theme.of(context).textTheme.titleLarge,
+                    Row(
+                      children: [
+                        const Icon(Icons.directions_car_outlined, color: Color(0xFF1E88E5)),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Vehicle Details',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF1565C0),
+                          ),
+                        ),
+                      ],
                     ),
-                    const Divider(),
+                    const Divider(height: 20),
                     _buildEditableField(
                       'License Plate',
                       _plateController,
@@ -134,29 +204,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 28),
 
             // Action Items
             ListTile(
-              leading: const Icon(Icons.history, color: Colors.blue),
-              title: const Text('Reservation History'),
-              trailing: const Icon(Icons.arrow_forward_ios),
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE3F2FD),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.history, color: Color(0xFF1E88E5), size: 20),
+              ),
+              title: const Text('Reservation History', style: TextStyle(fontWeight: FontWeight.w600)),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
-                // **TODO: Navigate to HistoryScreen**
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Navigating to Reservation History...'),
+                    duration: Duration(seconds: 2),
                   ),
                 );
               },
             ),
             const Divider(),
             ListTile(
-              leading: const Icon(Icons.feedback, color: Colors.purple),
-              title: const Text('Submit Feedback'),
-              trailing: const Icon(Icons.arrow_forward_ios),
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE3F2FD),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.feedback_outlined, color: Color(0xFF1E88E5), size: 20),
+              ),
+              title: const Text('Submit Feedback', style: TextStyle(fontWeight: FontWeight.w600)),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
-                // **Navigate to FeedbackScreen**
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => const FeedbackScreen(),
@@ -164,21 +249,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 );
               },
             ),
-            const Divider(),
 
-            const SizedBox(height: 40),
+            const SizedBox(height: 36),
 
             // Logout Button
             ElevatedButton.icon(
               onPressed: _logout,
-              icon: const Icon(Icons.logout, color: Colors.white),
+              icon: const Icon(Icons.logout),
               label: const Text(
                 'Log Out',
-                style: TextStyle(fontSize: 18, color: Colors.white),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                minimumSize: const Size(double.infinity, 50),
+                backgroundColor: const Color(0xFFE74C3C),
+                minimumSize: const Size(double.infinity, 54),
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
           ],

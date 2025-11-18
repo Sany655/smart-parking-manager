@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'slot_management_screen.dart';
 import 'manage_feedback_screen.dart';
 import 'manage_payment_screen.dart';
-import '../parking-attendant/manage_checkinout_screen.dart';
 import '../auth/login_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
@@ -13,98 +12,109 @@ class AdminDashboardScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Dashboard'),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.blue,
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            child: const Text('Logout'),
+          ),
+        ),
+        actions: [
+          IconButton(
+            tooltip: 'Logout',
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const LoginScreen()));
+            },
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'Welcome to Admin Panel',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFF0F7FF), Color(0xFFE3F2FD)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Welcome to Admin Panel',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF1565C0),
+                ),
               ),
-            ),
-            const SizedBox(height: 32),
-            // Slot Management Card
-            _buildDashboardCard(
-              context: context,
-              title: 'Manage Parking Slots',
-              description: 'Create, view, and delete parking slots',
-              icon: Icons.local_parking,
-              color: Colors.blue,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const SlotManagementScreen(),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            // Feedback Management Card
-            _buildDashboardCard(
-              context: context,
-              title: 'Manage Feedback',
-              description: 'View and manage user feedback',
-              icon: Icons.feedback,
-              color: Colors.purple,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const ManageFeedbackScreen(),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            // Payment Management Card
-            _buildDashboardCard(
-              context: context,
-              title: 'Manage Payments',
-              description: 'View and manage payment transactions',
-              icon: Icons.payment,
-              color: Colors.green,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const ManagePaymentScreen(),
-                  ),
-                );
-              },
-            ),
-            // const SizedBox(height: 16),
-            // Check-In/Check-Out Management Card
-            // _buildDashboardCard(
-            //   context: context,
-            //   title: 'Manage Check-In/Out',
-            //   description: 'Manage vehicle check-in and check-out',
-            //   icon: Icons.car_rental,
-            //   color: Colors.teal,
-            //   onTap: () {
-            //     Navigator.of(context).push(
-            //       MaterialPageRoute(
-            //         builder: (context) => const ,
-            //       ),
-            //     );
-            //   },
-            // ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                'Manage parking and monitor activities',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              // Slot Management Card
+              _buildDashboardCard(
+                context: context,
+                title: 'Manage Parking Slots',
+                description: 'Create, view, and delete parking slots',
+                icon: Icons.local_parking_outlined,
+                iconBgColor: const Color(0xFFE3F2FD),
+                iconColor: const Color(0xFF1E88E5),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const SlotManagementScreen(),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Feedback Management Card
+              _buildDashboardCard(
+                context: context,
+                title: 'Manage Feedback',
+                description: 'View and manage user feedback',
+                icon: Icons.feedback_outlined,
+                iconBgColor: const Color(0xFFE8EAF6),
+                iconColor: const Color(0xFF3F51B5),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const ManageFeedbackScreen(),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Payment Management Card
+              _buildDashboardCard(
+                context: context,
+                title: 'Manage Payments',
+                description: 'View and manage payment transactions',
+                icon: Icons.payment_outlined,
+                iconBgColor: const Color(0xFFE8F5E9),
+                iconColor: const Color(0xFF4CAF50),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const ManagePaymentScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -115,58 +125,70 @@ class AdminDashboardScreen extends StatelessWidget {
     required String title,
     required String description,
     required IconData icon,
-    required Color color,
+    required Color iconBgColor,
+    required Color iconColor,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        elevation: 4,
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(0xFFE3F2FD),
+              width: 1.5,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              children: [
+                Container(
+                  width: 68,
+                  height: 68,
+                  decoration: BoxDecoration(
+                    color: iconBgColor,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: iconColor,
+                    size: 36,
+                  ),
                 ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 36,
-                ),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF1565C0),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
+                      const SizedBox(height: 6),
+                      Text(
+                        description,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.grey.shade600,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: color,
-              ),
-            ],
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: iconColor.withOpacity(0.6),
+                  size: 18,
+                ),
+              ],
+            ),
           ),
         ),
       ),

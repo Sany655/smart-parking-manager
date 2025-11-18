@@ -8,6 +8,7 @@ class SessionService {
   static const String _usernameKey = 'username';
   static const String _vehicleNumberKey = 'vehicle_number';
   static const String _isLoggedInKey = 'is_logged_in';
+  static const String _userRoleKey = 'user_role';
 
   /// Save user data after login
   static Future<void> saveUserData(Map<String, dynamic> userData) async {
@@ -37,14 +38,35 @@ class SessionService {
         await prefs.setString(_vehicleNumberKey, userData['vehicle_number'] ?? '');
       }
       
+      // Determine and save user role based on email
+      String role = 'user'; // default role
+      final email = userData['email'] as String?;
+      if (email == 'admin@gmail.com') {
+        role = 'admin';
+      } else if (email == 'attendant@gmail.com') {
+        role = 'attendant';
+      }
+      await prefs.setString(_userRoleKey, role);
+      
       // Save entire user object as JSON
       await prefs.setString(_userKey, jsonEncode(userData));
       await prefs.setBool(_isLoggedInKey, true);
       
-      print('User data saved successfully');
+      print('User data saved successfully with role: $role');
     } catch (e) {
       print('Error saving user data: $e');
       rethrow;
+    }
+  }
+
+  /// Get user role
+  static Future<String> getUserRole() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_userRoleKey) ?? 'user';
+    } catch (e) {
+      print('Error getting user role: $e');
+      return 'user';
     }
   }
 
@@ -127,6 +149,7 @@ class SessionService {
       await prefs.remove(_emailKey);
       await prefs.remove(_usernameKey);
       await prefs.remove(_vehicleNumberKey);
+      await prefs.remove(_userRoleKey);
       await prefs.setBool(_isLoggedInKey, false);
       print('User data cleared successfully');
     } catch (e) {

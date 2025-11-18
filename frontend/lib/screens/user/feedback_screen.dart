@@ -47,75 +47,142 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Submit Feedback')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text(
-                'Rate our parking service:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
+      appBar: AppBar(
+        title: const Text('Submit Feedback'),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFF0F7FF), Color(0xFFE3F2FD)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Rate your experience:',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF1565C0),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
 
-              // Rating Widget
-              Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(5, (index) {
-                    return IconButton(
-                      icon: Icon(
-                        index < _rating ? Icons.star : Icons.star_border,
-                        color: Colors.amber,
-                        size: 40,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _rating = (index + 1).toDouble();
-                        });
-                      },
-                    );
-                  }),
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              // Comment Input
-              const Text(
-                'Comments (optional):',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _commentController,
-                maxLines: 5,
-                decoration: const InputDecoration(
-                  hintText: 'Tell us about your experience...',
-                  border: OutlineInputBorder(),
-                  alignLabelWithHint: true,
-                ),
-                maxLength: 500,
-              ),
-              const SizedBox(height: 32),
-
-              // Submission Button
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ElevatedButton(
-                      onPressed: _submitFeedback,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        minimumSize: const Size(double.infinity, 50),
-                      ),
-                      child: const Text(
-                        'Submit Feedback',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
+                        // Rating Widget
+                        Center(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: List.generate(5, (index) {
+                              return IconButton(
+                                icon: Icon(
+                                  index < _rating ? Icons.star : Icons.star_border,
+                                  color: const Color(0xFFFFC107),
+                                  size: 44,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _rating = (index + 1).toDouble();
+                                  });
+                                },
+                              );
+                            }),
+                          ),
+                        ),
+                      ],
                     ),
-            ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Share your comments:',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF1565C0),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        TextFormField(
+                          controller: _commentController,
+                          maxLines: 5,
+                          decoration: InputDecoration(
+                            hintText: 'Tell us about your experience...',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            filled: true,
+                            fillColor: const Color(0xFFF5F5F5),
+                            alignLabelWithHint: true,
+                            prefixIcon: const Padding(
+                              padding: EdgeInsets.only(right: 12.0),
+                              child: Icon(Icons.comment_outlined, color: Color(0xFF1E88E5)),
+                            ),
+                            prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+                          ),
+                          maxLength: 500,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // Submission Button
+                _isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1E88E5)),
+                        ),
+                      )
+                    : ElevatedButton.icon(
+                        onPressed: _submitFeedback,
+                        icon: const Icon(Icons.send),
+                        label: const Text(
+                          'Submit Feedback',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF1E88E5),
+                          minimumSize: const Size(double.infinity, 54),
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+              ],
+            ),
           ),
         ),
       ),

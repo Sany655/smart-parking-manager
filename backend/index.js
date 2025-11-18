@@ -212,14 +212,18 @@ app.get('/user/profile/:id', (req, res) => {
 
 // Create Parking Slot route
 app.post('/slot/create', (req, res) => {
-    const { slot_number, location, is_available } = req.body;
+    const { slot_number, location, is_available, vehicle_type, price } = req.body;
     if (!slot_number || !location) {
         return res.status(400).json({ error: 'slot_number and location are required' });
     }
 
-    const query = 'INSERT INTO parking_slots (slot_number, location, is_available) VALUES (?, ?, ?)';
-    db.query(query, [slot_number, location, is_available || 'available'], (err, result) => {
+    console.log('Creating slot with:', { slot_number, location, is_available, vehicle_type, price });
+
+    const finalPrice = price ? parseFloat(price) : 0;
+    const query = 'INSERT INTO parking_slots (slot_number, location, is_available, vehicle_type, price) VALUES (?, ?, ?, ?, ?)';
+    db.query(query, [slot_number, location, is_available || 1, vehicle_type || 'Car', finalPrice], (err, result) => {
         if (err) {
+            console.error('Database error:', err);
             return res.status(500).json({ error: 'Database insert failed' });
         }
         res.json({ message: 'Parking slot created successfully', slot_id: result.insertId });

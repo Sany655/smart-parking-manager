@@ -112,7 +112,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
         if (response.statusCode == 200) {
           final responseData = jsonDecode(response.body);
-          print('Reservation created: $responseData');
 
           // Navigate to ConfirmationReceiptScreen
           Navigator.of(context).pushReplacement(
@@ -153,7 +152,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
             backgroundColor: Colors.red,
           ),
         );
-        print('Error: $e');
       }
 
       setState(() {
@@ -165,127 +163,181 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final fee = widget.reservationDetails['fee'] ?? 0.0;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Payment')),
+      appBar: AppBar(
+        title: const Text('Payment'),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             // 1. Fee Summary Card
             Card(
-              color: Colors.blue.shade100,
+              elevation: 4,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Amount Due:',
-                      style: Theme.of(context).textTheme.titleLarge,
+                      'Amount Due',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
+                    const SizedBox(height: 8),
                     Text(
                       '\$${fee.toStringAsFixed(2)}',
                       style: const TextStyle(
-                        fontSize: 28,
+                        fontSize: 36,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue,
+                        color: Color(0xFF1E88E5),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
 
             // 2. Payment Form
-            const Text(
-              'Credit Card Details',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  // Card Number
-                  TextFormField(
-                    controller: _cardNumberController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Card Number',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.credit_card),
-                    ),
-                    maxLength: 16,
-                    validator: (v) => (v?.length ?? 0) < 16
-                        ? 'Enter a 16-digit card number'
-                        : null,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Expiry and CVV
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _expiryController,
-                          keyboardType: TextInputType.datetime,
-                          decoration: const InputDecoration(
-                            labelText: 'MM/YY',
-                            border: OutlineInputBorder(),
-                          ),
-                          maxLength: 5,
-                          validator: (v) =>
-                              (v?.length ?? 0) < 5 ? 'Required' : null,
-                        ),
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Credit Card Details',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1565C0),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: TextFormField(
-                          controller: _cvvController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'CVV',
-                            border: OutlineInputBorder(),
-                          ),
-                          maxLength: 3,
-                          obscureText: true,
-                          validator: (v) =>
-                              (v?.length ?? 0) < 3 ? '3 digits required' : null,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Card Holder Name
-                  TextFormField(
-                    controller: _cardHolderNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Card Holder Name',
-                      border: OutlineInputBorder(),
                     ),
-                    validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
-                  ),
-                ],
+                    const SizedBox(height: 20),
+
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          // Card Number
+                          TextFormField(
+                            controller: _cardNumberController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: 'Card Number',
+                              prefixIcon: const Icon(Icons.credit_card_outlined),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                              filled: true,
+                              fillColor: const Color(0xFFF5F5F5),
+                            ),
+                            maxLength: 16,
+                            validator: (v) => (v?.length ?? 0) < 16
+                                ? 'Enter a 16-digit card number'
+                                : null,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Expiry and CVV
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _expiryController,
+                                  keyboardType: TextInputType.datetime,
+                                  decoration: InputDecoration(
+                                    labelText: 'MM/YY',
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                    filled: true,
+                                    fillColor: const Color(0xFFF5F5F5),
+                                  ),
+                                  maxLength: 5,
+                                  validator: (v) =>
+                                      (v?.length ?? 0) < 5 ? 'Required' : null,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _cvvController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    labelText: 'CVV',
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                    filled: true,
+                                    fillColor: const Color(0xFFF5F5F5),
+                                  ),
+                                  maxLength: 3,
+                                  obscureText: true,
+                                  validator: (v) =>
+                                      (v?.length ?? 0) < 3 ? '3 digits' : null,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Card Holder Name
+                          TextFormField(
+                            controller: _cardHolderNameController,
+                            decoration: InputDecoration(
+                              labelText: 'Card Holder Name',
+                              prefixIcon: const Icon(Icons.person_outline),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                              filled: true,
+                              fillColor: const Color(0xFFF5F5F5),
+                            ),
+                            validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 
-            const SizedBox(height: 48),
+            const SizedBox(height: 32),
 
             // 3. Pay Button
             _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : ElevatedButton(
-                    onPressed: _processPayment,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.indigo,
-                      minimumSize: const Size(double.infinity, 55),
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1E88E5)),
                     ),
-                    child: Text(
-                      'Pay \$${fee.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 18, color: Colors.white),
+                  )
+                : SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton.icon(
+                      onPressed: _processPayment,
+                      icon: const Icon(Icons.lock_outline),
+                      label: Text(
+                        'Pay \$${fee.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1E88E5),
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
                     ),
                   ),
           ],
