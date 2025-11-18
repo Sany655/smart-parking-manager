@@ -36,6 +36,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   http: ^1.1.0  # Add this line
   shared_preferences: ^2.2.0
+  velocity_x: ^4.0.0
+  google_fonts: ^4.0.3
 
 dev_dependencies:
   flutter_test:

@@ -67,6 +67,17 @@ CREATE TABLE Feedback (
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
+-- Create Undeveloped Features Feedback table
+CREATE TABLE Undeveloped_Feedback (
+    feedback_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    rating INT CHECK (rating >= 1 AND rating <= 5),
+    comments TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
 -- Insert sample data for testing
 INSERT INTO Users (username, email, password, phone, vehicle_number) VALUES
 ('asdf', 'asdf@gmail.com', 'asdfasdf', '1234567890', 'XYZ1234'),

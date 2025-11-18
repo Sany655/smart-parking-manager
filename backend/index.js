@@ -405,6 +405,153 @@ app.get('/user/reservations/:email', (req, res) => {
     });
 });
 
+// ============ UNDEVELOPED FEATURES FEEDBACK ENDPOINTS ============
+
+// Submit undeveloped feature feedback
+app.post('/undeveloped-feedback/submit', (req, res) => {
+    const { user_id, rating, comments } = req.body;
+    if (!user_id || !rating || !comments) {
+        return res.status(400).json({ error: 'user_id, rating, and comments are required' });
+    }
+
+    if (rating < 1 || rating > 5) {
+        return res.status(400).json({ error: 'Rating must be between 1 and 5' });
+    }
+
+    const query = 'INSERT INTO Undeveloped_Feedback (user_id, rating, comments) VALUES (?, ?, ?)';
+    db.query(query, [user_id, rating, comments], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database insert failed' });
+        }
+        res.json({ message: 'Feedback submitted successfully', feedback_id: result.insertId });
+    });
+});
+
+// Get all undeveloped feedback (for admin)
+app.get('/undeveloped-feedback/all', (req, res) => {
+    const query = `
+        SELECT uf.feedback_id, uf.user_id, uf.rating, uf.comments, 
+               uf.created_at, uf.updated_at, u.username
+        FROM Undeveloped_Feedback uf
+        LEFT JOIN users u ON uf.user_id = u.user_id
+        ORDER BY uf.created_at DESC
+    `;
+    db.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database query failed' });
+        }
+        res.json(results);
+    });
+});
+
+// Get undeveloped feedback by user ID
+app.get('/undeveloped-feedback/user/:id', (req, res) => {
+    const userId = req.params.id;
+    if (!userId) {
+        return res.status(400).json({ error: 'user_id is required' });
+    }
+
+    const query = `
+        SELECT uf.feedback_id, uf.user_id, uf.rating, uf.comments, 
+               uf.created_at, uf.updated_at
+        FROM Undeveloped_Feedback uf
+        WHERE uf.user_id = ?
+        ORDER BY uf.created_at DESC
+    `;
+    db.query(query, [userId], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database query failed' });
+        }
+        res.json(results);
+    });
+});
+
+// Update undeveloped feedback (user can edit their own)
+app.put('/undeveloped-feedback/update/:id', (req, res) => {
+    const feedbackId = req.params.id;
+    const { user_id, rating, comments } = req.body;
+
+    if (!feedbackId || !user_id || !rating || !comments) {
+        return res.status(400).json({ error: 'feedback_id, user_id, rating, and comments are required' });
+    }
+
+    if (rating < 1 || rating > 5) {
+        return res.status(400).json({ error: 'Rating must be between 1 and 5' });
+    }
+
+    // Verify that the user owns this feedback
+    const checkQuery = 'SELECT user_id FROM Undeveloped_Feedback WHERE feedback_id = ?';
+    db.query(checkQuery, [feedbackId], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database query failed' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Feedback not found' });
+        }
+        if (results[0].user_id !== user_id) {
+            return res.status(403).json({ error: 'Unauthorized: You can only edit your own feedback' });
+        }
+
+        const updateQuery = 'UPDATE Undeveloped_Feedback SET rating = ?, comments = ? WHERE feedback_id = ?';
+        db.query(updateQuery, [rating, comments, feedbackId], (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database update failed' });
+            }
+            res.json({ message: 'Feedback updated successfully' });
+        });
+    });
+});
+
+// Delete undeveloped feedback (user can delete their own)
+app.delete('/undeveloped-feedback/delete/:id', (req, res) => {
+    const feedbackId = req.params.id;
+    const { user_id } = req.body;
+
+    if (!feedbackId || !user_id) {
+        return res.status(400).json({ error: 'feedback_id and user_id are required' });
+    }
+
+    // Verify that the user owns this feedback
+    const checkQuery = 'SELECT user_id FROM Undeveloped_Feedback WHERE feedback_id = ?';
+    db.query(checkQuery, [feedbackId], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database query failed' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Feedback not found' });
+        }
+        if (results[0].user_id !== user_id) {
+            return res.status(403).json({ error: 'Unauthorized: You can only delete your own feedback' });
+        }
+
+        const deleteQuery = 'DELETE FROM Undeveloped_Feedback WHERE feedback_id = ?';
+        db.query(deleteQuery, [feedbackId], (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database delete failed' });
+            }
+            res.json({ message: 'Feedback deleted successfully' });
+        });
+    });
+});
+
+// Get feedback statistics
+app.get('/undeveloped-feedback/stats/overview', (req, res) => {
+    const query = `
+        SELECT 
+            COUNT(*) as total_feedback,
+            AVG(rating) as average_rating,
+            MAX(rating) as highest_rating,
+            MIN(rating) as lowest_rating
+        FROM Undeveloped_Feedback
+    `;
+    db.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database query failed' });
+        }
+        res.json(results[0]);
+    });
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`Server is listening on port http://localhost:${PORT}`);
