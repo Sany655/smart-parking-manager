@@ -76,49 +76,57 @@ app.post('/auth/register', (req, res) => {
 // Book Reservation route
 app.post('/reservation/create', (req, res) => {
     const { user_id, slot_id, start_time, end_time, amount } = req.body;
+
     if (!user_id || !slot_id || !start_time || !end_time) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    db.beginTransaction(err => {
-        if (err) return res.status(500).json({ error: 'Failed to start transaction' });
+    db.getConnection((err, conn) => {
+        if (err) return res.status(500).json({ error: 'DB connection failed' });
 
-        const reserveQuery = 'INSERT INTO reservations (user_id, slot_id, start_time, end_time) VALUES (?, ?, ?, ?)';
-        db.query(reserveQuery, [user_id, slot_id, start_time, end_time], (err, reserveResult) => {
-            if (err) {
-                return db.rollback(() => res.status(500).json({ error: 'Reservation insert failed' }));
-            }
+        conn.beginTransaction(err => {
+            if (err) return conn.rollback(() => res.status(500).json({ error: 'Failed to start transaction' }));
 
-            const reservationId = reserveResult.insertId;
-            const paymentQuery = 'INSERT INTO payments (reservation_id, amount, payment_status, payment_time) VALUES (?, ?, ?, NOW())';
-            
-            const paymentStatus = 'completed'; // or 'paid' depending on your flow
-            db.query(paymentQuery, [reservationId, amount || 0, paymentStatus], (err, paymentResult) => {
+            const reserveQuery = 'INSERT INTO reservations (user_id, slot_id, start_time, end_time) VALUES (?, ?, ?, ?)';
+            conn.query(reserveQuery, [user_id, slot_id, start_time, end_time], (err, reserveResult) => {
+
                 if (err) {
-                    return db.rollback(() => res.status(500).json({ error: 'Payment insert failed' }));
+                    return conn.rollback(() => res.status(500).json({ error: 'Reservation insert failed' }));
                 }
 
-                const checkQuery = 'INSERT INTO check_in_out (reservation_id, check_in_time, check_out_time) VALUES (?, NULL, NULL)';
-                db.query(checkQuery, [reservationId], (err, checkResult) => {
+                const reservationId = reserveResult.insertId;
+                const paymentQuery = 'INSERT INTO payments (reservation_id, amount, payment_status, payment_time) VALUES (?, ?, ?, NOW())';
+
+                conn.query(paymentQuery, [reservationId, amount || 0, 'completed'], (err, paymentResult) => {
                     if (err) {
-                        return db.rollback(() => res.status(500).json({ error: 'Check-in record insert failed' }));
+                        return conn.rollback(() => res.status(500).json({ error: 'Payment insert failed' }));
                     }
 
-                    const slotByQuery = 'UPDATE parking_slots SET is_available = ? WHERE slot_id = ?';
-                    db.query(slotByQuery, [false, slot_id], (err, slotResult) => {
+                    const checkQuery = 'INSERT INTO check_in_out (reservation_id, check_in_time, check_out_time) VALUES (?, NULL, NULL)';
+                    conn.query(checkQuery, [reservationId], (err) => {
                         if (err) {
-                            return db.rollback(() => res.status(500).json({ error: 'Updating slot status failed' }));
+                            return conn.rollback(() => res.status(500).json({ error: 'Check-in record insert failed' }));
                         }
-                    });
 
-                    db.commit(commitErr => {
-                        if (commitErr) {
-                            return db.rollback(() => res.status(500).json({ error: 'Transaction commit failed' }));
-                        }
-                        res.json({
-                            message: 'Reservation, payment and check record created successfully',
-                            reservation_id: reservationId,
-                            payment_id: paymentResult.insertId
+                        const slotByQuery = 'UPDATE parking_slots SET is_available = ? WHERE slot_id = ?';
+                        conn.query(slotByQuery, [false, slot_id], (err) => {
+                            if (err) {
+                                return conn.rollback(() => res.status(500).json({ error: 'Updating slot status failed' }));
+                            }
+
+                            conn.commit(commitErr => {
+                                if (commitErr) {
+                                    return conn.rollback(() => res.status(500).json({ error: 'Transaction commit failed' }));
+                                }
+
+                                conn.release();
+
+                                res.json({
+                                    message: 'Reservation created successfully',
+                                    reservation_id: reservationId,
+                                    payment_id: paymentResult.insertId
+                                });
+                            });
                         });
                     });
                 });
@@ -126,6 +134,7 @@ app.post('/reservation/create', (req, res) => {
         });
     });
 });
+
 
 // get fixed reservation route
 app.get('/reservation/:id', (req, res) => {

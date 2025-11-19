@@ -1,59 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../payment/confirmation_receipt_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-// NOTE: Placeholder for the next screen in the flow
-// class ConfirmationReceiptScreen extends StatelessWidget {
-//   final Map<String, dynamic> reservationData;
-//   const ConfirmationReceiptScreen({super.key, required this.reservationData});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: const Text('Receipt')),
-//       body: Center(
-//         child: Padding(
-//           padding: const EdgeInsets.all(24.0),
-//           child: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: [
-//               const Icon(
-//                 Icons.check_circle_outline,
-//                 color: Colors.green,
-//                 size: 80,
-//               ),
-//               const SizedBox(height: 20),
-//               const Text(
-//                 'Payment Successful!',
-//                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-//               ),
-//               const SizedBox(height: 10),
-//               Text(
-//                 'Your booking for ${reservationData['slotName']} is confirmed.',
-//                 style: const TextStyle(fontSize: 16),
-//               ),
-//               const SizedBox(height: 30),
-//               ElevatedButton(
-//                 onPressed: () {
-//                   // Navigate back to the home screen (ViewSlotsScreen) or a Dashboard
-//                   Navigator.of(context).popUntil((route) => route.isFirst);
-//                 },
-//                 child: const Text('Go to Home'),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+import 'dart:io';
+import 'dart:async';
 
 class PaymentScreen extends StatefulWidget {
   final Map<String, dynamic> reservationDetails;
 
-  // Example of details received from ReserveSlotScreen
-  // {'slotName': 'Level A, Slot 1', 'fee': 15.00}
   const PaymentScreen({super.key, required this.reservationDetails});
 
   @override
@@ -64,7 +19,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
-  // Form Controllers (Simplified for simulation)
   final TextEditingController _cardNumberController = TextEditingController(
     text: '4111222233334444',
   );
@@ -87,6 +41,31 @@ class _PaymentScreenState extends State<PaymentScreen> {
     super.dispose();
   }
 
+  String _getApiUrl() {
+    // Check if running on web first
+    if (kIsWeb) {
+      print('Running on Web - Using localhost API');
+      return 'http://localhost:3000/reservation/create';
+    }
+    
+    // For mobile platforms
+    try {
+      if (Platform.isAndroid) {
+        print('Running on Android - Using 10.0.2.2 API');
+        return 'http://10.0.2.2:3000/reservation/create';
+      } else if (Platform.isIOS) {
+        print('Running on iOS - Using localhost API');
+        return 'http://localhost:3000/reservation/create';
+      }
+    } catch (e) {
+      print('Platform detection failed, using default URL: $e');
+    }
+    
+    // Default fallback
+    print('Using default localhost API');
+    return 'http://localhost:3000/reservation/create';
+  }
+
   void _processPayment() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -94,26 +73,50 @@ class _PaymentScreenState extends State<PaymentScreen> {
       });
 
       try {
-        // Make reservation API call
-        final url = Uri.parse('http://localhost:3000/reservation/create');
-        final response = await http.post(
-          url,
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'user_id': widget.reservationDetails['userId'],
-            'slot_id': widget.reservationDetails['slotId'],
-            'start_time': widget.reservationDetails['startTime'],
-            'end_time': widget.reservationDetails['endTime'],
-            'amount': widget.reservationDetails['fee'],
-          }),
-        );
+        print('=== PAYMENT PROCESSING STARTED ===');
+        print('Platform: ${kIsWeb ? "Web" : "Mobile"}');
+        print('Reservation details: ${widget.reservationDetails}');
+
+        final url = Uri.parse(_getApiUrl());
+        print('API URL: $url');
+
+        final requestBody = {
+          'user_id': widget.reservationDetails['userId'],
+          'slot_id': widget.reservationDetails['slotId'],
+          'start_time': widget.reservationDetails['startTime'],
+          'end_time': widget.reservationDetails['endTime'],
+          'amount': widget.reservationDetails['fee'],
+        };
+        print('Request body: $requestBody');
+
+        final response = await http
+            .post(
+              url,
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+              },
+              body: jsonEncode(requestBody),
+            )
+            .timeout(
+              const Duration(seconds: 30),
+              onTimeout: () {
+                throw TimeoutException('Connection timeout - Server not responding after 30 seconds');
+              },
+            );
+
+        print('Response status code: ${response.statusCode}');
+        print('Response headers: ${response.headers}');
+        print('Response body: ${response.body}');
 
         if (!mounted) return;
 
         if (response.statusCode == 200) {
           final responseData = jsonDecode(response.body);
+          print('✓ Reservation created successfully!');
+          print('Reservation ID: ${responseData['reservation_id']}');
+          print('Payment ID: ${responseData['payment_id']}');
 
-          // Navigate to ConfirmationReceiptScreen
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => ConfirmationReceiptScreen(
@@ -128,37 +131,93 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ),
           );
         } else {
-          String errorMsg = 'Failed to create reservation';
+          String errorMsg = 'Failed to create reservation (Status: ${response.statusCode})';
           try {
             final decoded = jsonDecode(response.body);
             if (decoded is Map && decoded.containsKey('error')) {
               errorMsg = decoded['error'].toString();
             }
-          } catch (_) {}
-          
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorMsg),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      } catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+          } catch (_) {
+            errorMsg = 'Server error: ${response.body}';
+          }
 
-      setState(() {
-        _isLoading = false;
-      });
+          print('✗ Error response: $errorMsg');
+          if (!mounted) return;
+          
+          _showErrorSnackBar(errorMsg);
+        }
+      } on TimeoutException catch (e) {
+        print('✗ Timeout Exception: $e');
+        if (!mounted) return;
+        _showErrorSnackBar(
+          'Connection timed out!\n\n'
+          'Please check:\n'
+          '• Server is running (node server.js)\n'
+          '• Server is accessible on port 3000'
+        );
+      } on SocketException catch (e) {
+        print('✗ Socket Exception: $e');
+        if (!mounted) return;
+        _showErrorSnackBar(
+          'Cannot connect to server!\n\n'
+          'Troubleshooting steps:\n'
+          '1. Ensure server is running: node server.js\n'
+          '2. Check server console for errors\n'
+          '3. Verify port 3000 is not blocked\n'
+          '4. For Web: Check CORS settings'
+        );
+      } on FormatException catch (e) {
+        print('✗ Format Exception: $e');
+        if (!mounted) return;
+        _showErrorSnackBar('Invalid server response format');
+      } on http.ClientException catch (e) {
+        print('✗ ClientException: $e');
+        if (!mounted) return;
+        _showErrorSnackBar(
+          'Network error!\n\n'
+          'Common causes:\n'
+          '• Server is not running\n'
+          '• Incorrect server URL\n'
+          '• CORS issues (for web)\n'
+          '• Firewall blocking connection\n\n'
+          'Current URL: ${_getApiUrl()}'
+        );
+      } catch (e) {
+        print('✗ Unexpected Exception: $e');
+        print('Exception type: ${e.runtimeType}');
+        if (!mounted) return;
+        _showErrorSnackBar(
+          'Unexpected error occurred!\n\n'
+          'Error: ${e.toString()}\n'
+          'Type: ${e.runtimeType}'
+        );
+      } finally {
+        print('=== PAYMENT PROCESSING ENDED ===\n');
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
     }
-  }  @override
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 8),
+        action: SnackBarAction(
+          label: 'Dismiss',
+          textColor: Colors.white,
+          onPressed: () {},
+        ),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final fee = widget.reservationDetails['fee'] ?? 0.0;
 
@@ -181,7 +240,31 @@ class _PaymentScreenState extends State<PaymentScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // 1. Fee Summary Card
+            // Debug Info Banner (only in debug mode)
+            if (kIsWeb)
+              Container(
+                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  border: Border.all(color: Colors.orange),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: Colors.orange),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Running on Web. Server must be on localhost:3000',
+                        style: TextStyle(color: Colors.orange.shade900, fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+            // Fee Summary Card
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -212,7 +295,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ),
             const SizedBox(height: 28),
 
-            // 2. Payment Form
+            // Payment Form
             Card(
               elevation: 2,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -313,11 +396,20 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
             const SizedBox(height: 32),
 
-            // 3. Pay Button
+            // Pay Button
             _isLoading
                 ? const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1E88E5)),
+                    child: Column(
+                      children: [
+                        CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1E88E5)),
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Processing payment...',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
                     ),
                   )
                 : SizedBox(
@@ -335,6 +427,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1E88E5),
+                        foregroundColor: Colors.white,
                         elevation: 4,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
