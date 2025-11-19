@@ -115,16 +115,22 @@ class _SlotManagementScreenState extends State<SlotManagementScreen> {
 
       if (httpResponse.statusCode == 200) {
         final List<dynamic> data = List.from(jsonDecode(httpResponse.body));
-        return data
-            .map(
-              (slot) => ParkingSlot(
-                id: slot['slot_id'].toString(),
-                name: slot['location'],
-                is_available: slot['is_available'] as int,
-                ratePerHour: (slot['price'] as num?)?.toDouble() ?? 12.0,
-              ),
-            )
-            .toList();
+        return data.map((slot) {
+          final dynamic rawPrice = slot['price'];
+          double parsedPrice = 12.0;
+          if (rawPrice is num) {
+            parsedPrice = rawPrice.toDouble();
+          } else if (rawPrice is String) {
+            parsedPrice = double.tryParse(rawPrice) ?? 12.0;
+          }
+
+          return ParkingSlot(
+            id: slot['slot_id'].toString(),
+            name: slot['location'],
+            is_available: slot['is_available'] as int,
+            ratePerHour: parsedPrice,
+          );
+        }).toList();
       } else {
         throw Exception('Failed to load parking slots');
       }
