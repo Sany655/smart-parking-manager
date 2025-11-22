@@ -90,6 +90,22 @@ app.post('/reservation/create', (req, res) => {
                 return res.status(500).json({ error: 'Transaction start failed' });
             }
 
+            conn.query('SELECT * from Reservations where start_time <= ? and end_time >= ? and slot_id = ?',[end_time, start_time, slot_id], (err, results) => {
+                if (err) {
+                    conn.rollback(() => {
+                        conn.release();
+                        return res.status(500).json({ error: 'Database query failed' });
+                    });
+                }
+                if (results.length > 0) {
+                    conn.rollback(() => {
+                        conn.release();
+                        return res.status(409).json({ error: 'Time slot already booked for the selected parking slot' });
+                    });
+                }
+
+            });
+
             const reserveQuery = `
                 INSERT INTO reservations (user_id, slot_id, start_time, end_time)
                 VALUES (?, ?, ?, ?)
