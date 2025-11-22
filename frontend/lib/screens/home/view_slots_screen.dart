@@ -15,7 +15,7 @@ class ViewSlotsScreen extends StatefulWidget {
 
 class _ViewSlotsScreenState extends State<ViewSlotsScreen> {
   late Future<List<ParkingSlot>> _slotsFuture;
-  final List<String> _vehicleTypes = ['All', 'Car', 'Motorbike', 'Truck'];
+  List<String> _vehicleTypes = ['All'];
   String _selectedVehicleType = 'All';
   final List<String> _availabilityOptions = ['All', 'Available', 'Occupied'];
   String _selectedAvailability = 'All';
@@ -23,7 +23,28 @@ class _ViewSlotsScreenState extends State<ViewSlotsScreen> {
   @override
   void initState() {
     super.initState();
+    _loadSlots();
+  }
+
+  void _loadSlots() {
     _slotsFuture = _fetchParkingSlots();
+    // After fetching slots, derive unique vehicle types from supportedVehicleTypes
+    _slotsFuture.then((slots) {
+      final Set<String> types = {};
+      for (final slot in slots) {
+        for (final t in slot.supportedVehicleTypes) {
+          types.add(t);
+        }
+      }
+      setState(() {
+        _vehicleTypes = ['All', ...types.toList()];
+        if (!_vehicleTypes.contains(_selectedVehicleType)) {
+          _selectedVehicleType = 'All';
+        }
+      });
+    }).catchError((_) {
+      // keep defaults on error
+    });
   }
 
   // **SIMULATED API Call: GET /api/parking/slots**
@@ -93,7 +114,7 @@ class _ViewSlotsScreenState extends State<ViewSlotsScreen> {
             icon: const Icon(Icons.refresh),
             onPressed: () {
               setState(() {
-                _slotsFuture = _fetchParkingSlots();
+                _loadSlots();
               });
             },
           ),

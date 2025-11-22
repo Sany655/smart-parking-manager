@@ -264,7 +264,6 @@ class _ManageCheckInOutScreenState extends State<ManageCheckInOutScreen> {
                       final checkOutTime = record['check_out_time'];
                       final userName = record['username'] ?? 'Unknown';
                       final vehicleType = record['vehicle_type'] ?? 'N/A';
-                      final vehicleNumber = record['vehicle_number'] ?? 'N/A';
                       final slotNumber = record['slot_number'] ?? 'N/A';
 
                       return Card(
@@ -283,7 +282,7 @@ class _ManageCheckInOutScreenState extends State<ManageCheckInOutScreen> {
                                       children: [
                                         Text('$userName — $vehicleType', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                                         const SizedBox(height: 4),
-                                        Text('Plate: $vehicleNumber', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                                        const SizedBox(height: 4),
                                       ],
                                     ),
                                   ),
