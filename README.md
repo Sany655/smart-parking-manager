@@ -35,3 +35,4 @@ flutter run
 - Project setup — backend
 - Project setup — frontend
 - Running backend + frontend together
+     
