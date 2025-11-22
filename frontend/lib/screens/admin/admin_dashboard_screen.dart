@@ -79,22 +79,7 @@ class AdminDashboardScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Feedback Management Card
-              _buildDashboardCard(
-                context: context,
-                title: 'Manage Feedback',
-                description: 'View and manage user feedback',
-                icon: Icons.feedback_outlined,
-                iconBgColor: const Color(0xFFE8EAF6),
-                iconColor: const Color(0xFF3F51B5),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const ManageFeedbackScreen(),
-                    ),
-                  );
-                },
-              ),
+             
               const SizedBox(height: 16),
 
               // Payment Management Card

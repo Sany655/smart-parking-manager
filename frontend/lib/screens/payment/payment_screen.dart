@@ -239,30 +239,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            // Debug Info Banner (only in debug mode)
-            if (kIsWeb)
-              Container(
-                padding: const EdgeInsets.all(12),
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
-                  border: Border.all(color: Colors.orange),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.info_outline, color: Colors.orange),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Running on Web. Server must be on localhost:3000',
-                        style: TextStyle(color: Colors.orange.shade900, fontSize: 12),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+          children: <Widget>[      
 
             // Fee Summary Card
             Card(

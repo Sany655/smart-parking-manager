@@ -263,6 +263,7 @@ class _ManageCheckInOutScreenState extends State<ManageCheckInOutScreen> {
                       final checkInTime = record['check_in_time'];
                       final checkOutTime = record['check_out_time'];
                       final userName = record['username'] ?? 'Unknown';
+                      final vehicleType = record['vehicle_type'] ?? 'N/A';
                       final vehicleNumber = record['vehicle_number'] ?? 'N/A';
                       final slotNumber = record['slot_number'] ?? 'N/A';
 
@@ -280,9 +281,9 @@ class _ManageCheckInOutScreenState extends State<ManageCheckInOutScreen> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                        Text('$userName — $vehicleType', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                                         const SizedBox(height: 4),
-                                        Text('Vehicle: $vehicleNumber', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                                        Text('Plate: $vehicleNumber', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
                                       ],
                                     ),
                                   ),

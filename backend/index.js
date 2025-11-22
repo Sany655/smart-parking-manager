@@ -351,7 +351,7 @@ app.delete('/payment/delete/:id', (req, res) => {
 app.get('/checkinout/all', (req, res) => {
     const query = `
         SELECT c.check_id, c.reservation_id, c.check_in_time, c.check_out_time, 
-               u.username, u.vehicle_number, ps.slot_number
+               u.username, u.vehicle_number, ps.slot_number, ps.vehicle_type AS vehicle_type
         FROM check_in_out c
         LEFT JOIN reservations r ON c.reservation_id = r.reservation_id
         LEFT JOIN users u ON r.user_id = u.user_id
@@ -434,7 +434,7 @@ app.get('/user/reservations/:email', (req, res) => {
 
     const query = `
         SELECT r.reservation_id, r.start_time, r.end_time, ps.slot_number, ps.location,
-               c.check_id, c.check_in_time, c.check_out_time, u.vehicle_number
+               c.check_id, c.check_in_time, c.check_out_time, u.vehicle_number, ps.vehicle_type AS vehicle_type
         FROM reservations r
         LEFT JOIN parking_slots ps ON r.slot_id = ps.slot_id
         LEFT JOIN check_in_out c ON r.reservation_id = c.reservation_id

@@ -111,19 +111,7 @@ class _ManageFeedbackScreenState extends State<ManageFeedbackScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manage Feedback'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              setState(() {
-                _feedbackFuture = _fetchFeedback();
-              });
-            },
-          ),
-        ],
-      ),
+      
       body: FutureBuilder<List<dynamic>>(
         future: _feedbackFuture,
         builder: (context, snapshot) {

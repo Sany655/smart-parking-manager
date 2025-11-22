@@ -17,7 +17,7 @@ CREATE TABLE Users (
 
 CREATE TABLE Parking_Slots (
     slot_id INT PRIMARY KEY AUTO_INCREMENT,
-    slot_number VARCHAR(10) NOT NULL,
+    slot_number VARCHAR(10) NOT NULL UNIQUE,
     is_available BOOLEAN DEFAULT TRUE,
     location VARCHAR(100),
     vehicle_type ENUM('Bike', 'Car', 'MicroBus') NOT NULL,
