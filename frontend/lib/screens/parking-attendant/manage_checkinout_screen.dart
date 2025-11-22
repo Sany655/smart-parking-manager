@@ -163,54 +163,7 @@ class _ManageCheckInOutScreenState extends State<ManageCheckInOutScreen> {
     );
   }
 
-  void _showCreateCheckInDialog() {
-    final reservationController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Create Check-In Record'),
-          content: TextField(
-            controller: reservationController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Reservation ID',
-              hintText: 'Enter reservation ID',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (reservationController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter a reservation ID')),
-                  );
-                  return;
-                }
-                final reservationId = int.tryParse(reservationController.text);
-                if (reservationId == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Invalid reservation ID')),
-                  );
-                  return;
-                }
-                _createCheckIn(reservationId);
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-              child: const Text('Create'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  
 
   String _formatTime(String? time) {
     if (time == null || time.isEmpty) return 'Not yet';
@@ -412,12 +365,6 @@ class _ManageCheckInOutScreenState extends State<ManageCheckInOutScreen> {
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showCreateCheckInDialog,
-        backgroundColor: Colors.blue,
-        tooltip: 'Create Check-In Record',
-        child: const Icon(Icons.add),
       ),
     );
   }

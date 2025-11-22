@@ -6,8 +6,9 @@ import '../../services/session_service.dart';
 /// Clean, single implementation of the reserve slot screen.
 class ReserveSlotScreen extends StatefulWidget {
   final ParkingSlot selectedSlot;
+  final String? vehicleType;
 
-  const ReserveSlotScreen({super.key, required this.selectedSlot});
+  const ReserveSlotScreen({super.key, required this.selectedSlot, this.vehicleType});
 
   @override
   _ReserveSlotScreenState createState() => _ReserveSlotScreenState();
@@ -113,6 +114,7 @@ class _ReserveSlotScreenState extends State<ReserveSlotScreen> {
                     'userId': userId,
                     'slotId': int.parse(widget.selectedSlot.id),
                     'slotName': widget.selectedSlot.name,
+                    'vehicleType': widget.vehicleType ?? 'Unknown',
                     'fee': amount,
                     'startTime': _startTime.toIso8601String(),
                     'endTime': _endTime.toIso8601String(),
@@ -193,6 +195,14 @@ class _ReserveSlotScreenState extends State<ReserveSlotScreen> {
                                       color: Colors.grey.shade600,
                                     ),
                                   ),
+                                  if (widget.vehicleType != null) const SizedBox(height: 4),
+                                  if (widget.vehicleType != null)
+                                    Text(
+                                      'Vehicle: ${widget.vehicleType}',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),

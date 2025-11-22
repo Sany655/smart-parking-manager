@@ -124,11 +124,26 @@ class _SlotManagementScreenState extends State<SlotManagementScreen> {
             parsedPrice = double.tryParse(rawPrice) ?? 12.0;
           }
 
+          // Normalize supported vehicle types (backend may return a string or list)
+          dynamic vt = slot['vehicle_types'] ?? slot['supported_vehicle_types'] ?? slot['supportedVehicleTypes'] ?? slot['vehicle_type'];
+          List<String> supported = [];
+          if (vt == null) {
+            supported = ['Car', 'Motorbike', 'Truck'];
+          } else if (vt is List) {
+            supported = vt.map((e) => e.toString()).toList();
+          } else if (vt is String) {
+            supported = vt.toString().split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+          } else {
+            supported = [vt.toString()];
+          }
+          if (supported.isEmpty) supported = ['Car', 'Motorbike', 'Truck'];
+
           return ParkingSlot(
             id: slot['slot_id'].toString(),
             name: slot['location'],
             is_available: slot['is_available'] as int,
             ratePerHour: parsedPrice,
+            supportedVehicleTypes: supported,
           );
         }).toList();
       } else {

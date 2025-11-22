@@ -57,33 +57,8 @@ CREATE TABLE Payments (
     FOREIGN KEY (reservation_id) REFERENCES Reservations(reservation_id) ON DELETE CASCADE
 );
 
--- Create Feedback table
-CREATE TABLE Feedback (
-    feedback_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT,
-    rating INT CHECK (rating >= 1 AND rating <= 5),
-    comments TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
-);
-
--- Create Undeveloped Features Feedback table
-CREATE TABLE Undeveloped_Feedback (
-    feedback_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT,
-    rating INT CHECK (rating >= 1 AND rating <= 5),
-    comments TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
-);
-
 -- Insert sample data for testing
 INSERT INTO Users (username, email, password, phone, vehicle_number) VALUES
 ('asdf', 'asdf@gmail.com', 'asdfasdf', '1234567890', 'XYZ1234'),
 ('attendant', 'attendant@gmail.com', 'asdfasdf', '1234567890', 'XYZ1234'),
 ('admin', 'admin@gmail.com', 'asdfasdf', '0987654321', 'XYZ1234');
-
-INSERT INTO Feedback (user_id, rating, comments) VALUES
-(1, 4, 'Great parking system, but needs more slots.'),
-(2, 5, 'Very convenient and easy to use.');
