@@ -22,8 +22,6 @@ app.get('/', (req, res) => {
 
 // Login route
 app.post('/auth/login', (req, res) => {
-    console.log('login api called');
-    
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).json({ error: 'email and password are required' });
@@ -274,8 +272,6 @@ app.post('/slot/create', (req, res) => {
         return res.status(400).json({ error: 'slot_number and location are required' });
     }
 
-    console.log('Creating slot with:', { slot_number, location, is_available, vehicle_type, price });
-
     const finalPrice = price ? parseFloat(price) : 0;
     const query = 'INSERT INTO parking_slots (slot_number, location, is_available, vehicle_type, price) VALUES (?, ?, ?, ?, ?)';
     db.query(query, [slot_number, location, is_available || 1, vehicle_type || 'Car', finalPrice], (err, result) => {
@@ -378,8 +374,6 @@ app.get('/checkinout/all', (req, res) => {
         if (err) {
             return res.status(500).json({ error: 'Database query failed' });
         }
-        console.log(results);
-        
         res.json(results);
     });
 });

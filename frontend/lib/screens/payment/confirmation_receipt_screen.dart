@@ -12,7 +12,6 @@ class ConfirmationReceiptScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double fee = reservationData['fee'] ?? 0.0;
-    final String bookingId = reservationData['transactionId'] ?? 'N/A';
 
     String formatTime(String? time) {
       if (time == null) return 'N/A';
@@ -97,20 +96,7 @@ class ConfirmationReceiptScreen extends StatelessWidget {
                         color: const Color(0xFF1565C0),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    _buildDetailRow(
-                      'Booking ID:',
-                      bookingId,
-                      context,
-                    ),
                     const Divider(height: 20),
-                    _buildDetailRow(
-                      'Parking Slot:',
-                      reservationData['slotName'] ?? 'N/A',
-                      context,
-                      isPrimary: true,
-                    ),
-                    const SizedBox(height: 12),
                     _buildDetailRow(
                       'Total Fee Paid:',
                       '\$${fee.toStringAsFixed(2)}',
@@ -135,54 +121,7 @@ class ConfirmationReceiptScreen extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
-            // 3. QR Code Placeholder
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  children: [
-                    Text(
-                      'Scan at Entry Gate',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      width: 140,
-                      height: 140,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF0F7FF),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: const Color(0xFFBBDEFB),
-                          width: 2,
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.qr_code_2,
-                        size: 100,
-                        color: Color(0xFF1E88E5),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SelectableText(
-                      bookingId,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: Color(0xFF1565C0),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 32),
 
-            // 4. Action Button
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.of(context).push(

@@ -6,6 +6,7 @@ import 'dart:convert';
 import '../auth/registration_screen.dart';
 import '../admin/admin_dashboard_screen.dart';
 import '../../services/session_service.dart';
+import '../../services/platform_base_api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -22,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() async {
     // final url = Uri.parse('http://10.0.2.2:3000/auth/login');
-    final url = Uri.parse('http://localhost:3000/auth/login');
+    final url = Uri.parse('${BaseApiService.baseUrl}auth/login');
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;

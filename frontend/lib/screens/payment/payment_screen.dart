@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
+import '../../services/platform_base_api_service.dart';
 
 class PaymentScreen extends StatefulWidget {
   final Map<String, dynamic> reservationDetails;
@@ -29,7 +30,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     text: '123',
   );
   final TextEditingController _cardHolderNameController = TextEditingController(
-    text: 'John Doe',
+    text: "",
   );
 
   @override
@@ -39,31 +40,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
     _cvvController.dispose();
     _cardHolderNameController.dispose();
     super.dispose();
-  }
-
-  String _getApiUrl() {
-    // Check if running on web first
-    if (kIsWeb) {
-      print('Running on Web - Using localhost API');
-      return 'http://localhost:3000/reservation/create';
-    }
-    
-    // For mobile platforms
-    try {
-      if (Platform.isAndroid) {
-        print('Running on Android - Using 10.0.2.2 API');
-        return 'http://10.0.2.2:3000/reservation/create';
-      } else if (Platform.isIOS) {
-        print('Running on iOS - Using localhost API');
-        return 'http://localhost:3000/reservation/create';
-      }
-    } catch (e) {
-      print('Platform detection failed, using default URL: $e');
-    }
-    
-    // Default fallback
-    print('Using default localhost API');
-    return 'http://localhost:3000/reservation/create';
   }
 
   void _processPayment() async {
@@ -77,7 +53,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         print('Platform: ${kIsWeb ? "Web" : "Mobile"}');
         print('Reservation details: ${widget.reservationDetails}');
 
-        final url = Uri.parse(_getApiUrl());
+        final url = Uri.parse('${BaseApiService.baseUrl}reservation/create');
         print('API URL: $url');
 
         final requestBody = {
@@ -124,7 +100,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   ...widget.reservationDetails,
                   'reservation_id': responseData['reservation_id'],
                   'payment_id': responseData['payment_id'],
-                  'transactionId': 'TXN${responseData['payment_id']}',
                   'timeProcessed': DateTime.now().toString(),
                 },
               ),
@@ -180,7 +155,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           '• Incorrect server URL\n'
           '• CORS issues (for web)\n'
           '• Firewall blocking connection\n\n'
-          'Current URL: ${_getApiUrl()}'
+          'Current URL: ${BaseApiService.baseUrl}reservation/create'
         );
       } catch (e) {
         print('✗ Unexpected Exception: $e');

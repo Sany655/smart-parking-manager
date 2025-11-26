@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../auth/login_screen.dart';
+import '../../services/platform_base_api_service.dart';
 
 class ManageCheckInOutScreen extends StatefulWidget {
   const ManageCheckInOutScreen({super.key});
@@ -21,7 +22,7 @@ class _ManageCheckInOutScreenState extends State<ManageCheckInOutScreen> {
   }
 
   Future<List<dynamic>> _fetchCheckInOut() async {
-    final url = Uri.parse('http://localhost:3000/checkinout/all');
+    final url = Uri.parse('${BaseApiService.baseUrl}checkinout/all');
     try {
       final httpResponse = await http.get(url);
       if (httpResponse.statusCode == 200) {
@@ -36,7 +37,7 @@ class _ManageCheckInOutScreenState extends State<ManageCheckInOutScreen> {
   }
 
   Future<void> _createCheckIn(int reservationId) async {
-    final url = Uri.parse('http://localhost:3000/checkinout/create');
+    final url = Uri.parse('${BaseApiService.baseUrl}checkinout/create');
     try {
       final httpResponse = await http.post(
         url,
@@ -66,7 +67,7 @@ class _ManageCheckInOutScreenState extends State<ManageCheckInOutScreen> {
   }
 
   Future<void> _checkIn(int checkId) async {
-    final url = Uri.parse('http://localhost:3000/checkinout/checkin/$checkId');
+    final url = Uri.parse('${BaseApiService.baseUrl}checkinout/checkin/$checkId');
     try {
       final httpResponse = await http.put(url, headers: {'Content-Type': 'application/json'});
 
@@ -90,7 +91,7 @@ class _ManageCheckInOutScreenState extends State<ManageCheckInOutScreen> {
   }
 
   Future<void> _checkOut(int checkId) async {
-    final url = Uri.parse('http://localhost:3000/checkinout/checkout/$checkId');
+    final url = Uri.parse('${BaseApiService.baseUrl}checkinout/checkout/$checkId');
     try {
       final httpResponse = await http.put(url, headers: {'Content-Type': 'application/json'});
 
@@ -114,7 +115,7 @@ class _ManageCheckInOutScreenState extends State<ManageCheckInOutScreen> {
   }
 
   Future<void> _deleteRecord(int checkId) async {
-    final url = Uri.parse('http://localhost:3000/checkinout/delete/$checkId');
+    final url = Uri.parse('${BaseApiService.baseUrl}checkinout/delete/$checkId');
     try {
       final httpResponse = await http.delete(url);
 

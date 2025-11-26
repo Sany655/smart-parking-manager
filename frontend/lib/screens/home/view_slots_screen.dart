@@ -3,8 +3,8 @@ import 'package:http/http.dart' as http;
 import '../reservation/reserve_slot_screen.dart';
 import '../../model/parking_slot.dart';
 import 'dart:convert';
-import '../auth/login_screen.dart'; // Import the previous screen
-// import '../reservation/reserve_slot_screen.dart'; // Import the next screen
+import '../auth/login_screen.dart';
+import '../../services/platform_base_api_service.dart';
 
 class ViewSlotsScreen extends StatefulWidget {
   const ViewSlotsScreen({super.key});
@@ -50,7 +50,7 @@ class _ViewSlotsScreenState extends State<ViewSlotsScreen> {
   // **SIMULATED API Call: GET /api/parking/slots**
   Future<List<ParkingSlot>> _fetchParkingSlots() async {
     // final url = Uri.parse('http://10.0.2.2:3000/');
-    final url = Uri.parse('http://localhost:3000/');
+    final url = Uri.parse('${BaseApiService.baseUrl}');
     try {
       final httpResponse = await http.get(url);
 

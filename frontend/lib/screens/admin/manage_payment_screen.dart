@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../../services/platform_base_api_service.dart';
 
 class ManagePaymentScreen extends StatefulWidget {
   const ManagePaymentScreen({super.key});
@@ -21,7 +22,7 @@ class _ManagePaymentScreenState extends State<ManagePaymentScreen> {
 
   // Fetch all payments from API
   Future<List<dynamic>> _fetchPayments() async {
-    final url = Uri.parse('http://localhost:3000/payment/all');
+    final url = Uri.parse('${BaseApiService.baseUrl}payment/all');
     try {
       final httpResponse = await http.get(url);
 
@@ -38,7 +39,7 @@ class _ManagePaymentScreenState extends State<ManagePaymentScreen> {
 
   // Update payment status
   Future<void> _updatePaymentStatus(int paymentId, String newStatus) async {
-    final url = Uri.parse('http://localhost:3000/payment/update/$paymentId');
+    final url = Uri.parse('${BaseApiService.baseUrl}payment/update/$paymentId');
     try {
       final httpResponse = await http.put(
         url,
@@ -69,7 +70,7 @@ class _ManagePaymentScreenState extends State<ManagePaymentScreen> {
 
   // Delete payment
   Future<void> _deletePayment(int paymentId) async {
-    final url = Uri.parse('http://localhost:3000/payment/delete/$paymentId');
+    final url = Uri.parse('${BaseApiService.baseUrl}payment/delete/$paymentId');
     try {
       final httpResponse = await http.delete(url);
 

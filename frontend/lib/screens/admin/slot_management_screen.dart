@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../../model/parking_slot.dart';
 import 'dart:convert';
-import '../auth/login_screen.dart'; // Import the previous screen
-// import '../reservation/reserve_slot_screen.dart'; // Import the next screen
+import '../auth/login_screen.dart';
+import '../../services/platform_base_api_service.dart';
 
 class SlotManagementScreen extends StatefulWidget {
   const SlotManagementScreen({super.key});
@@ -109,7 +109,7 @@ class _SlotManagementScreenState extends State<SlotManagementScreen> {
   // **SIMULATED API Call: GET /api/parking/slots**
   Future<List<ParkingSlot>> _fetchParkingSlots() async {
     // final url = Uri.parse('http://10.0.2.2:3000/');
-    final url = Uri.parse('http://localhost:3000/');
+    final url = Uri.parse('${BaseApiService.baseUrl}');
     try {
       final httpResponse = await http.get(url);
 
@@ -162,7 +162,7 @@ class _SlotManagementScreenState extends State<SlotManagementScreen> {
     String vehicleType,
     double price,
   ) async {
-    final url = Uri.parse('http://localhost:3000/slot/create');
+    final url = Uri.parse('${BaseApiService.baseUrl}slot/create');
     try {
       final httpResponse = await http.post(
         url,
@@ -200,7 +200,7 @@ class _SlotManagementScreenState extends State<SlotManagementScreen> {
 
   // **API Call: DELETE /slot/delete**
   Future<void> _deleteSlot(String slotId) async {
-    final url = Uri.parse('http://localhost:3000/slot/delete/$slotId');
+    final url = Uri.parse('${BaseApiService.baseUrl}slot/delete/$slotId');
     try {
       final httpResponse = await http.delete(url);
 

@@ -1,0 +1,36 @@
+parking-manager — Quick Start
+This repository contains a Node.js backend (backend/) and a Flutter frontend (frontend/).
+
+Prerequisites:
+
+Node.js & npm (for the backend)
+Flutter setup (for the frontend)
+MySQL server(Xampp)
+Run the project (PowerShell)
+
+Prepare the database (MySQL) -Open Xampp and start the apache and MySQL
+Start backend (new terminal)
+cd backend (goto the backend folder of this project in terminal or cmd or powershell)
+npm install
+npm start
+Start frontend (separate terminal)
+cd frontend (goto the frontend folder of this project in terminal or cmd or powershell)
+flutter pub get
+flutter run (to run in a browser press any of the browser showing in the list if any emulator/android devices are not connected, if connected then it will be automatically run in the connected device)
+
+Project summary
+
+Admin panel - admin@gmail.com, password:asdfasdf
+
+admina can manage parking slots
+admin can maange payment records
+
+User panel - you can create one with signup option or can use asdf@gmail.com, password:asdfasdf
+
+user can reserve parking slots with payments
+
+Attendant panel - attendant@gmail.com, password:asdfasdf
+
+attendant will checkin/out the users
+
+more detailed version is in the git repo: https://github.com/Sany655/smart-parking-manager

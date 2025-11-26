@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../home/view_slots_screen.dart'; // Navigate here on successful registration
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../../services/platform_base_api_service.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -40,7 +41,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
       // Send registration data to backend API
       // final url = Uri.parse('http://10.0.2.2:3000/auth/register');
-      final url = Uri.parse('http://localhost:3000/auth/register');
+      final url = Uri.parse('${BaseApiService.baseUrl}auth/register');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},

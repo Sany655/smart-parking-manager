@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'slot_management_screen.dart';
-import 'manage_feedback_screen.dart';
 import 'manage_payment_screen.dart';
 import '../auth/login_screen.dart';
 
