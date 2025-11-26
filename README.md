@@ -1,4 +1,4 @@
-# parking-manager — Quick Start
+# parking-manager - Quick Start
 
 This repository contains a Node.js backend (`backend/`) and a Flutter frontend (`frontend/`).
 
